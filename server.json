@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "coach.marian/eng-leadership-toolkit",
+  "description": "Engineering leadership benchmarks, 1:1 playbooks, developer value calculator. 3,400+ sessions.",
+  "repository": {
+    "url": "https://github.com/marian-kamenistak/eng-leadership-toolkit",
+    "source": "github"
+  },
+  "websiteUrl": "https://www.marian.coach/mcp",
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.marian.coach/mcp"
+    }
+  ]
+}
