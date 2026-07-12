@@ -1,0 +1,32 @@
+/**
+ * eng-leadership-toolkit — remote MCP server for marian.coach
+ * Served at https://www.marian.coach/mcp (apex-path convention, see /mcp-launch skill)
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "eng-leadership-toolkit",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-03-10",
+	"compatibility_flags": ["nodejs_compat"],
+	"routes": [
+		{ "pattern": "www.marian.coach/mcp*", "zone_name": "marian.coach" },
+		{ "pattern": "marian.coach/mcp*", "zone_name": "marian.coach" },
+	],
+	"migrations": [
+		{
+			"new_sqlite_classes": ["EngLeadershipToolkit"],
+			"tag": "v1",
+		},
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "EngLeadershipToolkit",
+				"name": "MCP_OBJECT",
+			},
+		],
+	},
+	"observability": {
+		"enabled": true,
+	},
+}
