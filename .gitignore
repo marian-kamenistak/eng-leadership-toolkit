@@ -177,3 +177,7 @@ worker-configuration.d.ts
 Icon?
 Icon
 
+# Internal launch tracking (never ship)
+
+LAUNCH-STATUS.md
+
