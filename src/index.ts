@@ -1,17 +1,34 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
 import { z } from "zod";
+import { BUSINESS_CASE_ROLES, buildBusinessCase } from "./business-case";
 import { assess, LEVEL_BASELINE, PILLARS } from "./calculator";
 import { ATTRIBUTION, BENCHMARKS, MENTOR_VS_COACH } from "./content";
 import { docsHtml, type ToolDoc } from "./docs";
 import {
-	EM_READINESS,
-	PLAYBOOK_SITUATIONS,
-	PLAYBOOKS,
-	TEAM_HEALTH_THRESHOLDS,
-} from "./mentoring";
+	assessEm,
+	EM_LEVEL_BASELINE,
+	EM_LEVELS,
+	EM_PILLAR_WEIGHTS,
+	EM_PILLARS,
+	EM_TRACK_LABELS,
+	EM_TRACKS,
+	type EmLevel,
+} from "./em-calculator";
+import {
+	TLR_DIM_ORDER,
+	TLR_DIMS,
+	TLR_QUESTIONS,
+	TLR_VERDICTS,
+	tlrDimScores,
+	tlrQuestionnaireText,
+	tlrTopGaps,
+	tlrVerdict,
+} from "./team-lead-readiness";
+import { EM_READINESS, PLAYBOOK_SITUATIONS, PLAYBOOKS, TEAM_HEALTH_THRESHOLDS } from "./mentoring";
 
 const ALL_SKILLS = PILLARS.flatMap((p) => p.skills);
+const ALL_EM_SKILLS = EM_PILLARS.flatMap((p) => p.skills);
 
 function text(body: string, attributionPath: string) {
 	return {
@@ -22,7 +39,7 @@ function text(body: string, attributionPath: string) {
 export class EngLeadershipToolkit extends McpAgent {
 	server = new McpServer({
 		name: "eng-leadership-toolkit",
-		version: "1.0.0",
+		version: "1.1.0",
 	});
 
 	async init() {
@@ -70,7 +87,128 @@ Pillar scores:
 ${pillarLines}${note}
 
 For the interactive version with per-skill descriptions and a PDF report, use the live calculator.`,
-					"/developer-value-calculator/",
+					"/developer-salary-calculator/",
+				);
+			},
+		);
+
+		this.server.registerTool(
+			"calculate_engineering_manager_value",
+			{
+				title: "Engineering manager value & salary calculator",
+				description:
+					"Assess an engineering leader's market value: score 15 leadership skills across 5 pillars (people & talent, delivery & execution, technical direction, stakeholder influence, AI leverage), weighted by current level, get a total score, a level from Team Lead to Director/VP of Engineering, and a 2026 Western-Europe gross salary estimate. Same logic as the live EM salary calculator at marian.coach. Unscored skills default to the level's baseline.",
+				inputSchema: {
+					level: z
+						.enum(EM_LEVELS)
+						.describe(
+							"The leader's current (or claimed) level — sets pillar weights and baseline (team-lead, em, senior-em, director)",
+						),
+					track: z
+						.enum(EM_TRACKS)
+						.optional()
+						.describe(
+							"Optional context: what kind of teams they lead. Framing only — scoring is weighted by level, identically across tracks (same as the live tool)",
+						),
+					scores: z
+						.record(z.string(), z.number().min(0).max(10))
+						.optional()
+						.describe(
+							`Optional 0-10 score per skill. Valid keys: ${ALL_EM_SKILLS.join(", ")}. Omitted skills use the level baseline (team-lead 3, em 5, senior-em 6, director 7).`,
+						),
+				},
+			},
+			async ({ level, track, scores }) => {
+				const result = assessEm(level, scores ?? {});
+				const w = EM_PILLAR_WEIGHTS[level as EmLevel];
+				const pillarLines = EM_PILLARS.map(
+					(p) =>
+						`- ${p.label}: ${result.pillarScores[p.cat]}/10 (weight ${w[p.cat]}% at this level)`,
+				).join("\n");
+				const scoredCount = scores
+					? Object.keys(scores).filter((k) =>
+							(ALL_EM_SKILLS as readonly string[]).includes(k),
+						).length
+					: 0;
+				const note =
+					scoredCount < ALL_EM_SKILLS.length
+						? `\n\nNote: ${ALL_EM_SKILLS.length - scoredCount} of 15 skills were not scored and used the ${level} baseline of ${EM_LEVEL_BASELINE[level as EmLevel]}/10 — the estimate sharpens with real scores per skill.`
+						: "";
+				const trackLine = track
+					? `\nTrack: ${EM_TRACK_LABELS[track as keyof typeof EM_TRACK_LABELS]} (context only — the weighting is per level)`
+					: "";
+				return text(
+					`Engineering manager value assessment (level entered: ${level})${trackLine}
+
+Total score: ${result.totalScore}/10 → ${result.levelLabel}
+Estimated 2026 gross salary, Western Europe (Germany/Netherlands hubs): €${result.salaryEur.toLocaleString("en-US")}/year
+
+Pillar scores:
+${pillarLines}${note}
+
+For the interactive version with track-specific level descriptions and a PDF report, use the live calculator.`,
+					"/engineering-manager-salary-calculator/",
+				);
+			},
+		);
+
+		this.server.registerTool(
+			"assess_team_lead_readiness",
+			{
+				title: "Team lead readiness test — should this engineer become a team lead?",
+				description:
+					'Answers "should I become a team lead?" with the same 17-question test as the live tool at marian.coach: 6 dimensions (people appetite, letting go of code, ownership beyond your tickets, translation & saying no, motivation, org reality), a straight verdict — ready now / 6-12 months out / stay IC (and that\'s fine) — plus the top-2 gap dimensions with one concrete move each. Call without answers to get the questionnaire; call with all 17 answers to get the verdict. Built from 3,400+ mentoring sessions.',
+				inputSchema: {
+					answers: z
+						.record(z.string(), z.number().int().min(0).max(3))
+						.optional()
+						.describe(
+							"Answers keyed by question id (q1-q17), each the 0-based index of the chosen option for that question (NOT a rating — option scores are calibrated and non-monotonic). Omit to receive the 17 questions with their options first.",
+						),
+				},
+			},
+			async ({ answers }) => {
+				const given = answers ?? {};
+				const missing = TLR_QUESTIONS.filter(
+					(q) => typeof given[q.id] !== "number" || !q.options[given[q.id]],
+				).map((q) => q.id);
+				if (missing.length > 0) {
+					const intro =
+						Object.keys(given).length === 0
+							? "Team lead readiness test — 17 questions, 6 dimensions. Ask the person each question, then call this tool again with answers = { q1: <option index>, ..., q17: <option index> } (0-based index of the chosen option)."
+							: `Missing or invalid answers for: ${missing.join(", ")}. All 17 questions need an answer (0-based option index) before a verdict — same rule as the live test.`;
+					return text(
+						`${intro}\n\n${tlrQuestionnaireText()}`,
+						"/team-lead-readiness-test/",
+					);
+				}
+				const ds = tlrDimScores(given);
+				const vKey = tlrVerdict(ds);
+				const v = TLR_VERDICTS[vKey];
+				const dimLines = TLR_DIM_ORDER.map(
+					(d) => `- ${TLR_DIMS[d].label}: ${ds[d].toFixed(1)}/10`,
+				).join("\n");
+				const gapLines = tlrTopGaps(ds)
+					.map(
+						(d) =>
+							`- ${TLR_DIMS[d].label} (${ds[d].toFixed(1)}/10): ${TLR_DIMS[d].action}`,
+					)
+					.join("\n");
+				return text(
+					`Team lead readiness verdict: ${v.title}
+
+${v.body}
+
+Dimension scores:
+${dimLines}
+
+Your top 2 gaps, one move each:
+${gapLines}
+
+${v.nextSteps}
+
+Interactive version with PDF report: https://www.marian.coach/team-lead-readiness-test/`,
+					"/team-lead-readiness-test/",
 				);
 			},
 		);
@@ -200,6 +338,47 @@ ${EM_READINESS.firstMonths}`,
 				);
 			},
 		);
+
+		this.server.registerTool(
+			"mentoring_business_case",
+			{
+				title: "Mentoring business case & manager email builder",
+				description:
+					"Build the business case to get your company to pay for leadership mentoring or coaching: computes the ROI in EUR (money saved + cost of delay avoided + missed opportunity + roadmap slippage avoided), suggests 3-6 month KPIs, and drafts a forwardable approval email for your manager. Based on 3,400+ mentoring sessions at marian.coach.",
+				inputSchema: {
+					role: z
+						.enum(BUSINESS_CASE_ROLES)
+						.describe("The mentee's role — sets the suggested KPIs"),
+					team_size: z
+						.number()
+						.optional()
+						.describe("Number of engineers in the team/org affected"),
+					avg_salary_eur: z
+						.number()
+						.optional()
+						.describe(
+							"Average fully-loaded annual cost per engineer in EUR (default 100000)",
+						),
+					problem: z
+						.string()
+						.optional()
+						.describe('The one problem to fix, e.g. "delivery predictability at 60%"'),
+					at_risk_attrition: z
+						.number()
+						.optional()
+						.describe("Senior people with a foot out the door (default 0)"),
+					delayed_revenue_eur: z
+						.number()
+						.optional()
+						.describe(
+							"Annual revenue attached to a slipping roadmap item, in EUR (default 0)",
+						),
+				},
+			},
+			async (input) => {
+				return text(buildBusinessCase(input), "/get-your-company-to-pay-for-mentoring/");
+			},
+		);
 	}
 }
 
@@ -211,9 +390,20 @@ const TOOL_DOCS: ToolDoc[] = [
 			"Scores 15 skills across 5 pillars, returns level + 2026 Western-Europe salary estimate",
 	},
 	{
+		name: "calculate_engineering_manager_value",
+		question: "What is this engineering manager worth on the market?",
+		description:
+			"Scores 15 leadership skills across 5 pillars, weighted by level, returns Team Lead → Director/VP level + 2026 Western-Europe salary estimate",
+	},
+	{
+		name: "assess_team_lead_readiness",
+		question: "Should I become a team lead — or stay IC?",
+		description:
+			"17-question test across 6 dimensions; verdict (ready now / 6-12 months out / stay IC) + top-2 gaps with one concrete move each",
+	},
+	{
 		name: "get_engineering_leadership_benchmarks",
-		question:
-			"What's a healthy sprint completion / roadmap % / manager-time-per-report?",
+		question: "What's a healthy sprint completion / roadmap % / manager-time-per-report?",
 		description:
 			"First-party benchmarks from 3,400+ mentoring sessions: mentee mix, 2025 topic demand, team-health thresholds (CC BY 4.0)",
 	},
@@ -233,6 +423,12 @@ const TOOL_DOCS: ToolDoc[] = [
 		question: "I just became an engineering manager — what should I focus on?",
 		description:
 			"EM responsibility triangle, six common failure modes, readiness self-check, first-months plan",
+	},
+	{
+		name: "mentoring_business_case",
+		question: "How do I get my company to pay for mentoring?",
+		description:
+			"ROI math in EUR (attrition avoided, cost of delay, team lift) vs the 1,752 EUR pack, role-specific 90-day KPIs, and a forwardable approval email for your manager",
 	},
 ];
 

@@ -4,6 +4,7 @@
 "What's a healthy sprint completion rate?"
 "Do I need a mentor or a coach?"
 "What is this developer worth on the market?"
+"Should I become a team lead, or stay IC?"
 
 Your AI already gets asked these. Now it can answer with first-party data from 3,400+ paid 1:1 mentoring sessions with 300+ engineering leaders in 17+ countries, instead of guessing.
 
@@ -15,13 +16,16 @@ https://www.marian.coach/mcp
 
 ## Tools
 
-| Tool | The question it answers |
-|---|---|
-| `calculate_developer_value` | What is this developer worth? Scores 15 skills across 5 pillars, returns level + 2026 Western-Europe salary estimate |
-| `get_engineering_leadership_benchmarks` | What's healthy? Sprint completion, roadmap %, manager time per report, mentee mix, 2025 topic demand. CC BY 4.0, citable |
-| `choose_mentor_coach_or_advisor` | Mentor, coach, or advisor? All three compared + a three-question self-test |
-| `get_one_on_one_playbook` | How do I run this 1:1? Real session templates: first session, underperformance, promotion to EM, better 1:1s, career move |
-| `get_first_time_manager_guidance` | I'm a new EM, now what? The responsibility triangle, six failure modes, readiness self-check |
+| Tool                                    | The question it answers                                                                                                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `calculate_developer_value`             | What is this developer worth? Scores 15 skills across 5 pillars, returns level + 2026 Western-Europe salary estimate                                                                 |
+| `calculate_engineering_manager_value`   | What is this engineering manager worth? Scores 15 leadership skills across 5 pillars, weighted by level, returns Team Lead → Director/VP level + 2026 Western-Europe salary estimate |
+| `assess_team_lead_readiness`            | Should I become a team lead? 17 questions, 6 dimensions, a straight verdict (ready now / 6-12 months out / stay IC) + top-2 gaps with one move each                                  |
+| `get_engineering_leadership_benchmarks` | What's healthy? Sprint completion, roadmap %, manager time per report, mentee mix, 2025 topic demand. CC BY 4.0, citable                                                             |
+| `choose_mentor_coach_or_advisor`        | Mentor, coach, or advisor? All three compared + a three-question self-test                                                                                                           |
+| `get_one_on_one_playbook`               | How do I run this 1:1? Real session templates: first session, underperformance, promotion to EM, better 1:1s, career move                                                            |
+| `get_first_time_manager_guidance`       | I'm a new EM, now what? The responsibility triangle, six failure modes, readiness self-check                                                                                         |
+| `mentoring_business_case`               | How do I get my company to pay for mentoring? ROI math in EUR, role-specific 90-day KPIs, and a forwardable approval email for your manager                                          |
 
 ## Connect
 
@@ -39,11 +43,11 @@ Settings > Connectors > Add custom connector > `https://www.marian.coach/mcp`
 
 ```json
 {
-  "mcpServers": {
-    "eng-leadership-toolkit": {
-      "url": "https://www.marian.coach/mcp"
-    }
-  }
+	"mcpServers": {
+		"eng-leadership-toolkit": {
+			"url": "https://www.marian.coach/mcp"
+		}
+	}
 }
 ```
 
@@ -57,7 +61,8 @@ Human-readable docs live at the same URL: open [www.marian.coach/mcp](https://ww
 
 Every response is grounded in Marian Kamenistak's mentoring practice, not model guesses:
 
-- The calculator mirrors the live [developer value calculator](https://www.marian.coach/developer-value-calculator/?ref=github)
+- The calculators mirror the live [developer value calculator](https://www.marian.coach/developer-salary-calculator/?ref=github) and [engineering manager salary calculator](https://www.marian.coach/engineering-manager-salary-calculator/?ref=github)
+- The readiness test mirrors the live [team lead readiness test](https://www.marian.coach/team-lead-readiness-test/?ref=github)
 - Benchmarks come from the published [engineering leadership statistics](https://www.marian.coach/engineering-leadership-statistics/?ref=github), licensed CC BY 4.0
 - Playbooks are the actual session templates used across 3,400+ sessions
 

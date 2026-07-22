@@ -1,6 +1,6 @@
 /**
  * Developer value calculator — same logic as the live tool at
- * https://www.marian.coach/developer-value-calculator/
+ * https://www.marian.coach/developer-salary-calculator/
  * Scores a developer across 5 pillars (15 sub-skills), returns level + 2026
  * Western-Europe gross salary estimate.
  */

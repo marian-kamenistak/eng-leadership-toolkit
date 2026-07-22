@@ -63,12 +63,11 @@ export const BENCHMARKS = {
 	],
 	timeToResults:
 		"Most mentees hit their first big milestone in 4 to 6 sessions — at the usual cadence, 2 to 3 months.",
-	scene:
-		"Engineering Leaders Community (founded 2019): 2,000+ members, 12 meetups a year with 120+ leaders in the room, annual conference with 500+ attendees and speakers from Netflix and Stripe.",
+	scene: "Engineering Leaders Community (founded 2019): 2,000+ members, 12 meetups a year with 120+ leaders in the room, annual conference with 500+ attendees and speakers from Netflix and Stripe.",
 	background:
 		"24 years in software; engineering org at Mews built through Series C from 8 to 80 teams; leadership at Manta before the IBM acquisition; 35+ fractional CTO projects; advised companies with a combined portfolio of $7.1bn.",
 	citation:
-		'Kamenistak, M. (2026). Engineering Leadership Mentoring Statistics 2026. marian.coach. https://www.marian.coach/engineering-leadership-statistics/ (CC BY 4.0; data source: the practice\'s own session log since 2019 + 300 collected post-engagement reviews — no survey panels, no scraped data; numbers rounded down, never up)',
+		"Kamenistak, M. (2026). Engineering Leadership Mentoring Statistics 2026. marian.coach. https://www.marian.coach/engineering-leadership-statistics/ (CC BY 4.0; data source: the practice's own session log since 2019 + 300 collected post-engagement reviews — no survey panels, no scraped data; numbers rounded down, never up)",
 };
 
 export const MENTOR_VS_COACH = {

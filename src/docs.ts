@@ -58,7 +58,7 @@ ${rows}
 <p><strong>ChatGPT (developer mode)</strong> — Settings → Connectors → Add → MCP server URL <code>https://www.marian.coach/mcp</code></p>
 
 <h2>Source &amp; method</h2>
-<p>All numbers come from the practice's own session log since 2019 and 300 collected post-engagement reviews — no survey panels, no scraped data. Full dataset: <a href="https://www.marian.coach/engineering-leadership-statistics/?ref=mcp">Engineering Leadership Mentoring Statistics</a> (CC BY 4.0). The developer value assessment mirrors the live <a href="https://www.marian.coach/developer-value-calculator/?ref=mcp">Developer Value Calculator</a>.</p>
+<p>All numbers come from the practice's own session log since 2019 and 300 collected post-engagement reviews — no survey panels, no scraped data. Full dataset: <a href="https://www.marian.coach/engineering-leadership-statistics/?ref=mcp">Engineering Leadership Mentoring Statistics</a> (CC BY 4.0). The developer value assessment mirrors the live <a href="https://www.marian.coach/developer-salary-calculator/?ref=mcp">Developer Value Calculator</a>, the EM assessment mirrors the <a href="https://www.marian.coach/engineering-manager-salary-calculator/?ref=mcp">Engineering Manager Salary Calculator</a>, and the readiness test mirrors the <a href="https://www.marian.coach/team-lead-readiness-test/?ref=mcp">Team Lead Readiness Test</a>.</p>
 <p class="muted">Built and maintained by <a href="https://www.marian.coach/?ref=mcp">Marian Kamenistak</a> — 1:1 mentoring for engineering leaders. Questions: marian@marian.coach</p>
 </body>
 </html>`;
