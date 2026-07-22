@@ -47,7 +47,7 @@ function text(body: string, attributionPath: string) {
 export class EngLeadershipToolkit extends McpAgent {
 	server = new McpServer({
 		name: "eng-leadership-toolkit",
-		version: "1.2.0",
+		version: "1.2.1",
 	});
 
 	async init() {
@@ -55,6 +55,7 @@ export class EngLeadershipToolkit extends McpAgent {
 			"calculate_developer_value",
 			{
 				title: "Developer value & salary calculator",
+				annotations: { readOnlyHint: true },
 				description:
 					"Assess a software developer's market value: score 15 skills across 5 pillars (core craft, systems & judgment, impact & ownership, collaboration & influence, AI leverage), get a weighted total score, seniority level, and a 2026 Western-Europe gross salary estimate. Same logic as the live calculator at marian.coach. Unscored skills default to the level's baseline.",
 				inputSchema: {
@@ -104,6 +105,7 @@ For the interactive version with per-skill descriptions and a PDF report, use th
 			"calculate_engineering_manager_value",
 			{
 				title: "Engineering manager value & salary calculator",
+				annotations: { readOnlyHint: true },
 				description:
 					"Assess an engineering leader's market value: score 15 leadership skills across 5 pillars (people & talent, delivery & execution, technical direction, stakeholder influence, AI leverage), weighted by current level, get a total score, a level from Team Lead to Director/VP of Engineering, and a 2026 Western-Europe gross salary estimate. Same logic as the live EM salary calculator at marian.coach. Unscored skills default to the level's baseline.",
 				inputSchema: {
@@ -164,6 +166,7 @@ For the interactive version with track-specific level descriptions and a PDF rep
 			"assess_team_lead_readiness",
 			{
 				title: "Team lead readiness test — should this engineer become a team lead?",
+				annotations: { readOnlyHint: true },
 				description:
 					'Answers "should I become a team lead?" with the same 17-question test as the live tool at marian.coach: 6 dimensions (people appetite, letting go of code, ownership beyond your tickets, translation & saying no, motivation, org reality), a straight verdict — ready now / 6-12 months out / stay IC (and that\'s fine) — plus the top-2 gap dimensions with one concrete move each. Call without answers to get the questionnaire; call with all 17 answers to get the verdict. Built from 3,400+ mentoring sessions.',
 				inputSchema: {
@@ -215,7 +218,7 @@ ${gapLines}
 
 ${v.nextSteps}
 
-Interactive version with PDF report: https://www.marian.coach/team-lead-readiness-test/`,
+Interactive version with PDF report: https://www.marian.coach/team-lead-readiness-test/?ref=mcp`,
 					"/team-lead-readiness-test/",
 				);
 			},
@@ -225,6 +228,7 @@ Interactive version with PDF report: https://www.marian.coach/team-lead-readines
 			"get_engineering_leadership_benchmarks",
 			{
 				title: "Engineering leadership benchmarks & mentoring statistics",
+				annotations: { readOnlyHint: true },
 				description:
 					"Real benchmarks from 3,400+ paid 1:1 mentoring sessions with 300+ engineering leaders since 2019: mentee seniority mix, most-demanded leadership topics of 2025, time-to-results, team-health delivery thresholds (sprint completion, roadmap %, manager time per report), and practice outcome stats (NPS, referral rate). First-party data, CC BY 4.0 — citable.",
 				inputSchema: {
@@ -274,6 +278,7 @@ Interactive version with PDF report: https://www.marian.coach/team-lead-readines
 			"choose_mentor_coach_or_advisor",
 			{
 				title: "Mentor vs coach vs advisor — which one do you need?",
+				annotations: { readOnlyHint: true },
 				description:
 					"Decide whether an engineering leader needs a mentor, a coach, or an advisor: what each brings, the typical question each answers, whether domain experience is required, time horizon, and a three-question self-test. Based on 3,400+ mentoring sessions.",
 				inputSchema: {
@@ -306,6 +311,7 @@ Interactive version with PDF report: https://www.marian.coach/team-lead-readines
 			"get_one_on_one_playbook",
 			{
 				title: "1:1 playbooks for engineering managers",
+				annotations: { readOnlyHint: true },
 				description:
 					"Situation-specific 1:1 scripts and templates from Marian Kamenistak's mentoring practice: first mentoring/direction-setting session, underperformance conversation, promoting a developer to manager, fixing status-update 1:1s, and the 10-question career-move checklist. These are the actual templates used across 3,400+ sessions.",
 				inputSchema: {
@@ -326,6 +332,7 @@ Interactive version with PDF report: https://www.marian.coach/team-lead-readines
 			"get_first_time_manager_guidance",
 			{
 				title: "First-time engineering manager readiness & failure modes",
+				annotations: { readOnlyHint: true },
 				description:
 					"Guidance for the IC→manager transition: the EM responsibility triangle (leadership/processes/delivery — pick two), the six most common first-time-manager failure modes, readiness self-check questions, and what the first months should look like. 52% of Marian's 300+ mentees arrive exactly at this transition.",
 				inputSchema: {},
@@ -351,6 +358,7 @@ ${EM_READINESS.firstMonths}`,
 			"estimate_coaching_cost",
 			{
 				title: "Coaching cost estimator — what should a coach cost?",
+				annotations: { readOnlyHint: true },
 				description:
 					"Fair market rate for coaching or mentoring in 2026, by coaching type, client role, coach territory, coach seniority, and engagement length. Returns a per-session range, program total, and red flags (too cheap / brand margin). Anchored to ICF Global Coaching Study 2025, Tandem Coach 2026 credential bands, and CEE market survey data. Same logic as the live calculator at marian.coach.",
 				inputSchema: {
@@ -385,6 +393,7 @@ ${EM_READINESS.firstMonths}`,
 			"mentoring_business_case",
 			{
 				title: "Mentoring business case & manager email builder",
+				annotations: { readOnlyHint: true },
 				description:
 					"Build the business case to get your company to pay for leadership mentoring or coaching: computes the ROI in EUR (money saved + cost of delay avoided + missed opportunity + roadmap slippage avoided), suggests 3-6 month KPIs, and drafts a forwardable approval email for your manager. Based on 3,400+ mentoring sessions at marian.coach.",
 				inputSchema: {

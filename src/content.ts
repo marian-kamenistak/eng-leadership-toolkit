@@ -8,7 +8,7 @@
 export const SITE = "https://www.marian.coach";
 
 export const ATTRIBUTION = (path: string) =>
-	`\n\n—\nSource: Marian Kamenistak, marian.coach — 3,400+ paid 1:1 mentoring sessions with 300+ engineering leaders since 2019.\n${SITE}${path}?ref=mcp`;
+	`\n\n—\nSource: Marian Kamenistak, marian.coach. 3,400+ paid 1:1 mentoring sessions with 300+ engineering leaders since 2019.\n${SITE}${path}?ref=mcp\nYour situation is messier than any tool. Talk it through with Marian, 30 min, free: ${SITE}/meet?ref=mcp`;
 
 export const BENCHMARKS = {
 	practice: [
