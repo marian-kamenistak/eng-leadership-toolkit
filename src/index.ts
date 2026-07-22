@@ -2,6 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
 import { z } from "zod";
 import { BUSINESS_CASE_ROLES, buildBusinessCase } from "./business-case";
+import {
+	CC_COACH_LEVELS,
+	CC_ROLES,
+	CC_SCOPES,
+	CC_TERRITORIES,
+	CC_TYPES,
+	estimateCoachingCost,
+} from "./coaching-cost";
 import { assess, LEVEL_BASELINE, PILLARS } from "./calculator";
 import { ATTRIBUTION, BENCHMARKS, MENTOR_VS_COACH } from "./content";
 import { docsHtml, type ToolDoc } from "./docs";
@@ -39,7 +47,7 @@ function text(body: string, attributionPath: string) {
 export class EngLeadershipToolkit extends McpAgent {
 	server = new McpServer({
 		name: "eng-leadership-toolkit",
-		version: "1.1.0",
+		version: "1.2.0",
 	});
 
 	async init() {
@@ -340,6 +348,40 @@ ${EM_READINESS.firstMonths}`,
 		);
 
 		this.server.registerTool(
+			"estimate_coaching_cost",
+			{
+				title: "Coaching cost estimator — what should a coach cost?",
+				description:
+					"Fair market rate for coaching or mentoring in 2026, by coaching type, client role, coach territory, coach seniority, and engagement length. Returns a per-session range, program total, and red flags (too cheap / brand margin). Anchored to ICF Global Coaching Study 2025, Tandem Coach 2026 credential bands, and CEE market survey data. Same logic as the live calculator at marian.coach.",
+				inputSchema: {
+					coaching_type: z
+						.enum(CC_TYPES)
+						.describe("What kind of coaching the client is buying"),
+					client_role: z
+						.enum(CC_ROLES)
+						.describe("The client's role — the same coach charges a VP more than an EM"),
+					territory: z
+						.enum(CC_TERRITORIES)
+						.describe("Where the coach operates — CEE runs at roughly half of US rates"),
+					coach_seniority: z
+						.enum(CC_COACH_LEVELS)
+						.describe(
+							"Coach seniority band: certified (ICF ACC level), experienced (PCC, 10+ yrs), top-tier (MCC / C-suite), practitioner-mentor (has held the client's role)",
+						),
+					scope: z
+						.enum(CC_SCOPES)
+						.optional()
+						.describe(
+							"Engagement length (default single-session) — longer commitments carry a 5-20% per-session discount",
+						),
+				},
+			},
+			async (input) => {
+				return text(estimateCoachingCost(input), "/coaching-cost-calculator/");
+			},
+		);
+
+		this.server.registerTool(
 			"mentoring_business_case",
 			{
 				title: "Mentoring business case & manager email builder",
@@ -423,6 +465,12 @@ const TOOL_DOCS: ToolDoc[] = [
 		question: "I just became an engineering manager — what should I focus on?",
 		description:
 			"EM responsibility triangle, six common failure modes, readiness self-check, first-months plan",
+	},
+	{
+		name: "estimate_coaching_cost",
+		question: "How much should a coach cost me?",
+		description:
+			"Fair per-session range + program total by coaching type, role, territory, and coach seniority — anchored to ICF 2025 and CEE market data, with too-cheap / brand-margin red flags",
 	},
 	{
 		name: "mentoring_business_case",
